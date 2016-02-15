@@ -15,12 +15,14 @@ SOURCES += main.cpp\
     qextserialport.cpp \
     qextserialbase.cpp \
     posix_qextserialport.cpp \
-    reader.cpp
+    reader.cpp \
+    baccarat.cpp
 
 HEADERS  += mainwindow.h \
     qextserialport.h \
     qextserialbase.h \
     posix_qextserialport.h \
-    reader.h
+    reader.h \
+    baccarat.h
 
 FORMS    += mainwindow.ui
