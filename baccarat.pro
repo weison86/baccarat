@@ -4,15 +4,23 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql network
 
 TARGET = baccarat
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    qextserialport.cpp \
+    qextserialbase.cpp \
+    posix_qextserialport.cpp \
+    reader.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    qextserialport.h \
+    qextserialbase.h \
+    posix_qextserialport.h \
+    reader.h
 
 FORMS    += mainwindow.ui
