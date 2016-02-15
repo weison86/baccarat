@@ -103,7 +103,8 @@ public:
     BaccaratItem *getItem(int index);
     QList<BaccaratItem*> items;
     BaccaratItemType type;
-
+    BaccaratItem *bacitem;
+    BaccaratItem *calitem;
     BaccaratItem *totalChipsItem;
     BaccaratItem *totalMoneyItem;
     quint32 rowNum;

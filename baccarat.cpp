@@ -90,7 +90,8 @@ TypeArea::TypeArea(quint32 row, quint32 count, BaccaratItemType areatype)
     TypeArea *typeArea;
     typeArea = this;
 
-    BaccaratItem *bacitem = new BaccaratItem[count];
+   // BaccaratItem *bacitem = new BaccaratItem[count];
+    bacitem = new BaccaratItem[count];
     for(int i = 0; i < count; i++)
     {
         (bacitem+i)->type = type;
@@ -99,7 +100,8 @@ TypeArea::TypeArea(quint32 row, quint32 count, BaccaratItemType areatype)
         items << (bacitem + i);
 
     }
-    BaccaratItem *calitem = new BaccaratItem[2];
+//    BaccaratItem *calitem = new BaccaratItem[2];
+    calitem = new BaccaratItem[2];
     totalChipsItem = calitem;
     totalChipsItem->type = calChipstype;
     totalMoneyItem = calitem + 1;
@@ -124,12 +126,14 @@ BaccaratItem *TypeArea::getItem(int index)
 TypeArea::~TypeArea()
 {
 
-    delete items.at(0);
-    for(int i = 0; i < items.length();i++)
-    {
-       delete items.at(i);
+//    delete items.at(0);
+//    for(int i = 0; i < items.length();i++)
+//    {
+//       delete items.at(i);
 
-    }
+//    }
+    delete []bacitem;
+    delete []calitem;
 //    delete totalChipsItem;
 //    delete totalMoneyItem;
 }
