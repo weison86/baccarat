@@ -66,7 +66,7 @@ public:
     void initlossList(QList<BaccaratItem *> *list);
     void initShowLabel();
     void handleResult(int key);
-    bool connectdatabase();
+
 private:
     Ui::MainWindow *ui;
 

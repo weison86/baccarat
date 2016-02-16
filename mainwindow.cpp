@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QtSql>
 #include <QSqlQueryModel>
+#include "database.h"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -68,7 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
             initShowLabel();
     //         if(!connectdatabase())
     //             return 0;
-         connectdatabase();
+        // connectdatabase();
+        connectdatabase("192.168.1.59",3306,"bargainingchipsys","test","123");
 }
 
 //MainWindow::~MainWindow()
@@ -76,28 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    delete ui;
 //}
 
-bool MainWindow::connectdatabase()
-{
 
-    QSqlDatabase ChipDataBase=QSqlDatabase::addDatabase("QMYSQL");
-    ChipDataBase.setHostName("192.168.1.59");
-    ChipDataBase.setPort(3306);
-    ChipDataBase.setDatabaseName("bargainingchipsys");
-    ChipDataBase.setUserName("test");
-    ChipDataBase.setPassword("123");
-    if( !ChipDataBase.open() )
-    {
-        qDebug()<<"this,warning,failure";
-        return false;
-    }
-    else
-    {
-        qDebug()<<"this,ok,success";
-        return true;
-    }
-
-
-}
 
 void MainWindow::initANT()
 {

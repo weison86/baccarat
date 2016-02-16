@@ -23,6 +23,7 @@ HEADERS  += mainwindow.h \
     qextserialbase.h \
     posix_qextserialport.h \
     reader.h \
-    baccarat.h
+    baccarat.h \
+    database.h
 
 FORMS    += mainwindow.ui
