@@ -101,15 +101,19 @@ bool MainWindow::connectdatabase()
 
 void MainWindow::initANT()
 {
+    betList.at(0)->SetAntNum(1 << 0);
+    betList.at(1)->SetAntNum(1 << 1);
+    betList.at(2)->SetAntNum(1 << 2);
     bettestList << betList.mid(0,3);
 
-    betList.at(8)->SetAntNum(4);
-    betList.at(9)->SetAntNum(5);
-    betList.at(10)->SetAntNum(6);
+    betList.at(8)->SetAntNum(1 << 3);
+    betList.at(9)->SetAntNum(1 << 4);
+    betList.at(10)->SetAntNum(1 << 5);
     bettestList << betList.mid(8,3);
-    betList.at(16)->SetAntNum(7);
-    betList.at(17)->SetAntNum(8);
-    betList.at(18)->SetAntNum(9);
+
+    betList.at(16)->SetAntNum(1 << 6);
+    betList.at(17)->SetAntNum(1 << 7);
+    betList.at(18)->SetAntNum(1 << 8);
     bettestList << betList.mid(16,3);
 
     losstestList << lossList.mid(0,3);
@@ -563,7 +567,7 @@ void MainWindow::scheduleNextBet()
 
     currentItem = bettestList.at(currentIndex);
     quint16 Ant = currentItem->getAntNum();
-    reader->Set_ANT(1 << Ant);
+    reader->Set_ANT(Ant);
     inventoryTimer->start(50);
 
 
