@@ -20,6 +20,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private slots:
+    void on_waitResult_clicked();
     void ReadUid(QList<QByteArray> list);
     void inventory();
 
@@ -104,6 +105,9 @@ private:
 
     BaccaratDesk *Desk;
 
+    int inIndex;
+    int outIndex;
+
     void attachTableWidget(BaccaratDesk *desk);
     void attachBaccaratArea(BaccaratArea *area);
     void attachTypeArea(TypeArea *type);
@@ -128,6 +132,7 @@ private:
     void handleBaccaratResult();
 
     QPalette winpe;
+    QPalette defpe;
 };
 
 #endif // MAINWINDOW_H

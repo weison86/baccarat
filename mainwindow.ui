@@ -242,7 +242,7 @@
      <rect>
       <x>150</x>
       <y>10</y>
-      <width>493</width>
+      <width>578</width>
       <height>29</height>
      </rect>
     </property>
@@ -276,14 +276,14 @@
      <item>
       <widget class="QPushButton" name="readyBet">
        <property name="text">
-        <string>Ready</string>
+        <string>投注</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="startBet">
        <property name="text">
-        <string>投注</string>
+        <string>停止投注</string>
        </property>
       </widget>
      </item>
@@ -299,6 +299,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="waitResult">
+       <property name="text">
+        <string>等待结果</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="income">

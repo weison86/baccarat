@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     // this->setWindowFlags(Qt::FramelessWindowHint);
 
+
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
@@ -32,17 +33,22 @@ MainWindow::MainWindow(QWidget *parent) :
     setupParam(Desk);
     initParam();
 
+    ui->readyBet->setFocus();
+    ui->readyBet->setDefault(true);
+
     winpe.setColor(QPalette::Window,Qt::green);
+
+    defpe.setColor(QPalette::Window,Qt::darkBlue);
     ui->BankLabel->setAutoFillBackground(true);
     ui->PlayLabel->setAutoFillBackground(true);
     ui->TieLabel->setAutoFillBackground(true);
     ui->BankPairLabel->setAutoFillBackground(true);
     ui->PlayPairLabel->setAutoFillBackground(true);
 
-
+    resetItem();
 
     setupReader(SERIAL);
-    //setupReader("/dev/ttyUSB0");
+
 
     inventoryTimer = new QTimer;
 
@@ -55,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     BacGamble->currentdesk = Desk;
     BacGamble->state = readybetState;
-    initShowLabel();
+  //  initShowLabel();
     connectdatabase(HOSTNAME,PORT,DATABASENAME,USERNAME,PASSWD);
 }
 
@@ -101,86 +107,45 @@ void MainWindow::keyReleaseEvent (QKeyEvent *event)
     int k;
 
     k = event->key();
-    int key;
-    if(k == Qt::Key_Enter){
-        if(BacGamble->state == readybetState )
-        {
-            keyList.clear();
-            emit ui->readyBet->click();
+    //  int key;
 
-            return;
-
-        }
-        if(BacGamble->state == startbetState)
-        {
-            qDebug() << "startbetState";
-            if(keyList.length() > 2)
-            {
-                return;
-            }
-            key = keyList.at(0)*10 + keyList.at(1);
-            handleResult(key);
-
-        }
-
-
-    }
-    else
+    switch(k)
     {
-        switch(k)
-        {
-        case Qt::Key_0:
-            keyList << 0;
-            break;
-        case Qt::Key_1:
-            keyList << 1;
-            break;
-        case Qt::Key_2:
-            keyList << 2;
-            break;
-        case Qt::Key_3:
-            keyList << 3;
-            break;
-        case Qt::Key_4:
-            keyList << 4;
-            break;
-        case Qt::Key_5:
-            keyList << 5;
-            break;
-        case Qt::Key_6:
-            keyList << 6;
-            break;
-        case Qt::Key_7:
-            keyList << 7;
-            break;
-        case Qt::Key_8:
-            keyList << 8;
-            break;
-        case Qt::Key_9:
-            keyList << 9;
-            break;
-            //  default:
-        }
-        //keyList << k;
+    case Qt::Key_0:
+        keyList << 0;
+        break;
+    case Qt::Key_1:
+        keyList << 1;
+        break;
+    case Qt::Key_2:
+        keyList << 2;
+        break;
+    case Qt::Key_3:
+        keyList << 3;
+        break;
+    case Qt::Key_4:
+        keyList << 4;
+        break;
+    case Qt::Key_5:
+        keyList << 5;
+        break;
+    case Qt::Key_6:
+        keyList << 6;
+        break;
+    case Qt::Key_7:
+        keyList << 7;
+        break;
+    case Qt::Key_8:
+        keyList << 8;
+        break;
+    case Qt::Key_9:
+        keyList << 9;
+        break;
+        //        default:
     }
 
 
 
-
-    //    if(BacGamble->state == startbetState){
-    //        switch(k)
-    //        {
-    //        case Qt::Key_1: setWinArea(ui->BankLabel); ui->PlayLabel->setEnabled(false); ui->TieLabel->setEnabled(false); break;
-    //        case Qt::Key_2: setWinArea(ui->PlayLabel); ui->BankLabel->setEnabled(false);ui->TieLabel->setEnabled(false); break;
-    //        case Qt::Key_3: setWinArea(ui->TieLabel);ui->BankLabel->setEnabled(false);ui->PlayLabel->setEnabled(false);  break;
-    //        case Qt::Key_4: setWinArea(ui->BankPairLabel);break;
-    //        case Qt::Key_5: setWinArea(ui->PlayPairLabel);break;
-    //            ui->startBet->setFocus();
-    //            ui->startBet->setDefault(true);
-
-    //            //        case Qt::Key_1:ui->BankLabel->setEnabled(true); setWinColor(ui->BankLabel); break;
-    //            //        case Qt::Key_2:ui->PlayLabel->setEnabled(ture); setWinColor(ui->PlayLabel);
-    //            //        case Qt::Key_3: setWinColor(ui->TieLabel);
 
 
 }
@@ -351,6 +316,9 @@ void MainWindow::setupReader(QString comnum)
 
 void MainWindow::initParam()
 {
+
+    inIndex=0;
+    outIndex=0;
     initbetList(&betList);
     initlossList(&lossList);
 
@@ -421,7 +389,7 @@ void MainWindow::ReadUid(QList<QByteArray> list)
     static int num;
     int count = list.length();
     //  currentItem->setText("0");
-      qDebug() << "readuid";
+    qDebug() << "readuid";
 
     //  int count =0;
     QByteArray uid;
@@ -445,7 +413,7 @@ void MainWindow::ReadUid(QList<QByteArray> list)
     currentItem->SetCount(count);
     currentItem->SetUids(list);
     currentItem->setText(QString::number(moneySum));
-//    qDebug() << currentItem->getAntNum();
+    //    qDebug() << currentItem->getAntNum();
 
 
     scheduleNextBet();
@@ -528,9 +496,9 @@ void MainWindow::scheduleNextBet()
 
     currentItem = bettestList.at(currentIndex);
     quint16 Ant = currentItem->getAntNum();
- //   reader->Set_ANT(Ant);
-    inventory();
-//    inventoryTimer->start(0);
+    reader->Set_ANT(Ant);
+
+    inventoryTimer->start(50);
 
 
 }
@@ -539,6 +507,7 @@ void MainWindow::resetItem()
     for(int i =0;i < betList.length(); i++)
     {
         betList.at(i)->setText("");
+        betList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
         betList.at(i)->typearea->totalChipsItem->setText("");
         betList.at(i)->typearea->totalMoneyItem->setText("");
     }
@@ -546,9 +515,16 @@ void MainWindow::resetItem()
     for(int i =0;i < lossList.length(); i++)
     {
         lossList.at(i)->setText("");
+        lossList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
         lossList.at(i)->typearea->totalChipsItem->setText("");
         lossList.at(i)->typearea->totalMoneyItem->setText("");
     }
+
+   ui->BankLabel->setPalette(defpe);
+   ui->BankPairLabel->setPalette(defpe);
+   ui->PlayLabel->setPalette(defpe);
+   ui->PlayPairLabel->setPalette(defpe);
+   ui->TieLabel->setPalette(defpe);
 
 
 
@@ -559,7 +535,9 @@ void MainWindow::on_readyBet_clicked()
     qDebug() << "readybet press";
     BacGamble->state = startbetState;
     ui->readyBet->setEnabled(false);
+
     ui->startBet->setEnabled(true);
+    ui->startBet->setDefault(true);
     ui->startBet->setFocus();
     ui->income->setEnabled(false);
     ui->output->setEnabled(false);
@@ -577,41 +555,88 @@ void MainWindow::on_startBet_clicked()
 
     ui->readyBet->setEnabled(false);
     ui->startBet->setEnabled(false);
-    ui->income->setEnabled(true);
-    ui->income->setFocus();
-    ui->income->setDefault(true);
+    ui->waitResult->setEnabled(true);
+    ui->waitResult->setFocus();
+    ui->waitResult->setDefault(true);
+    ui->income->setEnabled(false);
     ui->output->setEnabled(false);
     ui->End->setEnabled(false);
     //disconnect(this,)
-    // inventoryTimer->disconnect(this);
+    inventoryTimer->disconnect(this);
 
     // disconnect(inventory,tim);
-    //  inventoryTimer->stop();
+    inventoryTimer->stop();
+}
+
+void MainWindow::on_waitResult_clicked()
+{
+    int key;
+    if(keyList.isEmpty())
+    {
+        return;
+    }
+    key = keyList.at(0)*10 + keyList.at(1);
+
+    if(key > 12)
+    {
+        keyList.clear();
+        return;
+    }
+    handleResult(key);
+    ui->readyBet->setEnabled(false);
+    ui->startBet->setEnabled(false);
+    ui->waitResult->setEnabled(false);
+    ui->income->setEnabled(true);
+    ui->income->setDefault(true);
+    ui->income->setFocus();
+    ui->output->setEnabled(false);
+    ui->End->setEnabled(false);
+
+    // QBrush(QColor(238, 59, 59))
+
+
 }
 
 void MainWindow::on_income_clicked()
 {
+    if(inIndex < incomeList.length()){
+        incomeList.at(inIndex++)->setBackgroundColor(QColor(255, 0, 0, 127));
 
-    ui->readyBet->setEnabled(false);
-    ui->startBet->setEnabled(false);
-    ui->income->setEnabled(false);
-    ui->output->setEnabled(true);
-    ui->output->setFocus();
-    ui->output->setDefault(true);
-    ui->End->setEnabled(false);
+    }
+    else
+    {
+        ui->readyBet->setEnabled(false);
+        ui->startBet->setEnabled(false);
+        ui->waitResult->setEnabled(false);
+        ui->income->setEnabled(false);
+        ui->output->setEnabled(true);
+        ui->output->setFocus();
+        ui->output->setDefault(true);
+        ui->End->setEnabled(false);
+
+    }
 
 }
 
 void MainWindow::on_output_clicked()
 {
-    ui->readyBet->setEnabled(false);
-    ui->startBet->setEnabled(false);
-    ui->income->setEnabled(false);
-    ui->output->setEnabled(false);;
-    ui->End->setEnabled(true);
-    ui->End->setFocus();
-    ui->End->setDefault(true);
 
+    if(outIndex < outputList.length()){
+        outputList.at(outIndex++)->setBackgroundColor(QColor(255, 255, 0, 127));
+
+
+    }
+    else
+    {
+        ui->readyBet->setEnabled(false);
+        ui->startBet->setEnabled(false);
+        ui->waitResult->setEnabled(false);
+        ui->income->setEnabled(false);
+        ui->output->setEnabled(false);;
+        ui->End->setEnabled(true);
+        ui->End->setFocus();
+        ui->End->setDefault(true);
+    }
 }
 
 void MainWindow::on_End_clicked()
@@ -619,10 +644,12 @@ void MainWindow::on_End_clicked()
     ui->readyBet->setFocus();
     ui->readyBet->setDefault(true);
     ui->startBet->setEnabled(false);
+    ui->waitResult->setEnabled(false);
     ui->income->setEnabled(false);
     ui->output->setEnabled(false);
     ui->End->setEnabled(false);
     resetItem();
+    BacGamble->state = readybetState;
 
 }
 
@@ -1081,3 +1108,5 @@ void MainWindow::closeEvent ( QCloseEvent *event )
 
 
 }
+
+
