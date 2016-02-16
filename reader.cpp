@@ -53,6 +53,7 @@ void Reader::readMyCom()
     QByteArray endcodebd = QByteArray::fromRawData(endcode ,sizeof(endcode));
     QByteArray configbackbd = QByteArray::fromRawData(configback ,sizeof(configback));
     QByteArray bd = readAll();
+    qDebug() << bd.toHex();
 
     //      if(bytesAvailable() > 17)
     //      {
@@ -153,7 +154,7 @@ QByteArray Reader::inventory()
 
     QByteArray bd = QByteArray::fromRawData(query ,sizeof(query));
     return   write_cmd(cmd_inventory,bd);
-    // return bd;
+
 
 }
 quint16 Reader::cal_crc16(QByteArray ptr,  unsigned short len)

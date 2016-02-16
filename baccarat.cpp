@@ -14,14 +14,9 @@ BaccaratItem::BaccaratItem()
 
 BaccaratItem::~BaccaratItem()
 {
-    qDebug() << "Bac";
-    //clearData();
+
 }
-//BaccaratItem::~QTableWidgetItem ()
-//{
 
-
-//}
 
 
 void BaccaratItem::SetAntNum(quint16 num)

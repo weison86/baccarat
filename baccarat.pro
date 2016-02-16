@@ -24,6 +24,7 @@ HEADERS  += mainwindow.h \
     posix_qextserialport.h \
     reader.h \
     baccarat.h \
-    database.h
+    database.h \
+    config.h
 
 FORMS    += mainwindow.ui

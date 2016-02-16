@@ -3,6 +3,7 @@
 #include <QtSql>
 #include <QSqlQueryModel>
 #include "database.h"
+#include "config.h"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -40,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-    setupReader("/dev/ttyS1");
+    setupReader(SERIAL);
     //setupReader("/dev/ttyUSB0");
 
     inventoryTimer = new QTimer;
@@ -54,29 +55,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     BacGamble->currentdesk = Desk;
     BacGamble->state = readybetState;
-   // inventoryTimer->start(500);
-    // ui->readyBet->setEnabled(true);
-    //     //    ui->readyBet->setFocus();
-    //     //    ui->readyBet->setDefault(true);
-    //     ui->startBet->setEnabled(false);
-    //     ui->income->setEnabled(false);
-    //     ui->output->setEnabled(false);
-    //     ui->End->setEnabled(false);
-    //
-
-
-
-            initShowLabel();
-    //         if(!connectdatabase())
-    //             return 0;
-        // connectdatabase();
-        connectdatabase("192.168.1.59",3306,"bargainingchipsys","test","123");
+    initShowLabel();
+    connectdatabase(HOSTNAME,PORT,DATABASENAME,USERNAME,PASSWD);
 }
 
-//MainWindow::~MainWindow()
-//{
-//    delete ui;
-//}
 
 
 
@@ -356,7 +338,7 @@ void MainWindow::setupReader(QString comnum)
     reader->setParity(PAR_EVEN);
     reader->setStopBits(STOP_1);
     reader->setFlowControl(FLOW_OFF);
-    reader->setTimeout(500);
+    reader->setTimeout(0);
     // notifier = new QSocketNotifier(reader->Posix_File->handle(),QSocketNotifier::Read,this);
 
     reader->notifier = new QSocketNotifier(reader->Posix_File->handle(),QSocketNotifier::Read,this);
@@ -428,10 +410,6 @@ void MainWindow::setupDesk()
 void MainWindow::inventory()
 {
     inventoryTimer->stop();
-    //    static const char query[] ={0x05,0x07,0xFF,0xF0,0x01,0x00,0x6A,0x50};
-    //    QByteArray bd = QByteArray::fromRawData(query ,sizeof(query));
-    //    reader->readAll();
-    //    reader->write(bd);
     qDebug() << "inventory";
     reader->inventory();
 
@@ -440,7 +418,7 @@ void MainWindow::inventory()
 
 void MainWindow::ReadUid(QList<QByteArray> list)
 {
-
+    static int num;
     int count = list.length();
     //  currentItem->setText("0");
       qDebug() << "readuid";
@@ -460,12 +438,14 @@ void MainWindow::ReadUid(QList<QByteArray> list)
         moneyVal = getMoneyVal(uid);
         moneySum+=moneyVal;
 
+
     }
+    qDebug() << num++  <<"   " << moneySum;
     currentItem->SetMoney(moneySum);
     currentItem->SetCount(count);
     currentItem->SetUids(list);
     currentItem->setText(QString::number(moneySum));
-    qDebug() << currentItem->getAntNum();
+//    qDebug() << currentItem->getAntNum();
 
 
     scheduleNextBet();
@@ -548,8 +528,9 @@ void MainWindow::scheduleNextBet()
 
     currentItem = bettestList.at(currentIndex);
     quint16 Ant = currentItem->getAntNum();
-    reader->Set_ANT(Ant);
-    inventoryTimer->start(50);
+ //   reader->Set_ANT(Ant);
+    inventory();
+//    inventoryTimer->start(0);
 
 
 }
@@ -576,17 +557,16 @@ void MainWindow::resetItem()
 void MainWindow::on_readyBet_clicked()
 {
     qDebug() << "readybet press";
-    //  ui->tableWidget->clear();
     BacGamble->state = startbetState;
     ui->readyBet->setEnabled(false);
     ui->startBet->setEnabled(true);
     ui->startBet->setFocus();
-    //    ui->startBet->setDefault(true);
     ui->income->setEnabled(false);
     ui->output->setEnabled(false);
     ui->End->setEnabled(false);
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
-    inventoryTimer->start(30);
+    inventoryTimer->start(0);
+
 }
 
 //void MainWindow::
