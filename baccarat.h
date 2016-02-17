@@ -46,6 +46,7 @@ enum BaccaratGambleState
 {
     readybetState,
     startbetState,
+    waitResultState,
     incomeState,
     outputState,
     GambleEnd
