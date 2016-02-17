@@ -70,7 +70,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-
+    QList<QByteArray> outputUids;
+    QList<QByteArray> incomeUids;
     QTimer *inventoryTimer;
     BaccaratGamble *BacGamble;
 
@@ -87,6 +88,7 @@ private:
     QList<BaccaratItem *> currentlossList;
 
     QList<BaccaratItem *> incomeList;
+    QList<BaccaratItem *> winList;
     QList<BaccaratItem *> outputList;
     quint32 outTotalMVal;
     quint32 outTotalChips;

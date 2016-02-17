@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // ui->tableWidget->clear();
-
+    ui->tableWidget->horizontalHeader()->setVisible(true);
     ui->tableWidget->setSpan(4,0,1,8);
     ui->tableWidget->setSpan(5,0,1,8);
     ui->tableWidget->setSpan(6,0,1,8);
@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setupParam(Desk);
     initParam();
 
-    ui->readyBet->setFocus();
-    ui->readyBet->setDefault(true);
+    //    ui->readyBet->setFocus();
+    //    ui->readyBet->setDefault(true);
 
     winpe.setColor(QPalette::Window,Qt::green);
 
@@ -378,7 +378,7 @@ void MainWindow::setupDesk()
 void MainWindow::inventory()
 {
     inventoryTimer->stop();
-    qDebug() << "inventory";
+
     reader->inventory();
 
 
@@ -391,10 +391,6 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 
     static int num;
     int count = list.length();
-    //  currentItem->setText("0");
-    qDebug() << "readuid";
-
-    //  int count =0;
     QByteArray uid;
     int moneyVal=0;;
     int moneySum=0;
@@ -404,7 +400,7 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 
 
         uid = SwaptoDataBaseBytes(list.at(i)).toHex();
-        qDebug() << uid;
+       // qDebug() << uid;
 
         moneyVal = getMoneyVal(uid);
         moneySum+=moneyVal;
@@ -413,7 +409,7 @@ void MainWindow::ReadUid(QList<QByteArray> list)
     }
     if(BacGamble->state == startbetState)
     {
-        qDebug() << num++  <<"   " << moneySum;
+
         currentItem->SetMoney(moneySum);
         currentItem->SetCount(count);
         currentItem->SetUids(list);
@@ -423,9 +419,20 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 
     if(BacGamble->state == incomeState)
     {
-        qDebug() << moneySum;
+//        qDebug() << moneySum;
         ui->recMoneyLabel->setText(QString::number(moneySum));
         inventoryTimer->start(50);
+
+    }
+
+    if(BacGamble->state == outputState)
+    {
+       outputList.at(outIndex)->SetMoney(moneySum);
+       outputList.at(outIndex)->SetCount(count);
+       outputList.at(outIndex)->SetUids(list);
+       outputList.at(outIndex)->setText(QString::number(moneySum));
+
+       inventoryTimer->start(50);
 
     }
 
@@ -446,7 +453,7 @@ QByteArray MainWindow::SwaptoDataBaseBytes(QByteArray bd)
 int MainWindow::getMoneyVal(QString uid)
 {
 
-    //    qDebug() << "uid"  << uid;
+
     int moneyval;
     QSqlQuery query;
     query.prepare("select moneyval from bargainingchip where uid=?");
@@ -454,8 +461,6 @@ int MainWindow::getMoneyVal(QString uid)
     query.exec();
     query.next();
     moneyval = query.value(0).toInt();
-
-
 
     return moneyval;
 
@@ -477,14 +482,19 @@ void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
     TypeArea *type = bacItem->typearea;
     int totalCount = 0;
     int totalMoney = 0;
+    type->totalMoneyItem->uidList.clear();
+
     if(type)
     {
 
         int lenght = type->items.length();
         for(int i = 0; i < lenght;i++ )
         {
+
+
             int count = type->items.at(i)->getChipsCount();
             int money = type->items.at(i)->getMoney();
+            type->totalMoneyItem->uidList.append(type->items.at(i)->uidList);
             totalCount +=count;
             totalMoney +=money;
         }
@@ -494,6 +504,7 @@ void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
         type->totalMoneyItem->setText(QString::number(totalMoney));
         type->totalMoneyItem->SetMoney(totalMoney);
     }
+
 
 
 }
@@ -520,18 +531,18 @@ void MainWindow::resetItem()
 {
     for(int i =0;i < betList.length(); i++)
     {
-        betList.at(i)->setText("");
+        betList.at(i)->setText("0");
         betList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-        betList.at(i)->typearea->totalChipsItem->setText("");
-        betList.at(i)->typearea->totalMoneyItem->setText("");
+        betList.at(i)->typearea->totalChipsItem->setText("0");
+        betList.at(i)->typearea->totalMoneyItem->setText("0");
     }
 
     for(int i =0;i < lossList.length(); i++)
     {
-        lossList.at(i)->setText("");
+        lossList.at(i)->setText("0");
         lossList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-        lossList.at(i)->typearea->totalChipsItem->setText("");
-        lossList.at(i)->typearea->totalMoneyItem->setText("");
+        lossList.at(i)->typearea->totalChipsItem->setText("0");
+        lossList.at(i)->typearea->totalMoneyItem->setText("0");
     }
 
     ui->BankLabel->setPalette(defpe);
@@ -540,19 +551,38 @@ void MainWindow::resetItem()
     ui->PlayPairLabel->setPalette(defpe);
     ui->TieLabel->setPalette(defpe);
 
+    ui->readyBet->setFocus();
+    ui->readyBet->setDefault(true);
+    ui->startBet->setEnabled(false);
+    ui->waitResult->setEnabled(false);
+    ui->income->setEnabled(false);
+    ui->output->setEnabled(false);
+    ui->End->setEnabled(false);
+
+    winList.clear();
+    outputList.clear();
+    incomeList.clear();
+    outIndex = 0;
+    inIndex = 0;
+
+    ui->realMoneyLabel->clear();
+    ui->recMoneyLabel->clear();
+    incomeUids.clear();
+    outputUids.clear();
+
 
 
 }
 
 void MainWindow::on_readyBet_clicked()
 {
-    qDebug() << "readybet press";
+
 
     ui->readyBet->setEnabled(false);
-
     ui->startBet->setEnabled(true);
     ui->startBet->setDefault(true);
     ui->startBet->setFocus();
+    ui->waitResult->setEnabled(false);
     ui->income->setEnabled(false);
     ui->output->setEnabled(false);
     ui->End->setEnabled(false);
@@ -562,7 +592,6 @@ void MainWindow::on_readyBet_clicked()
 
 }
 
-//void MainWindow::
 
 
 void MainWindow::on_startBet_clicked()
@@ -620,6 +649,10 @@ void MainWindow::on_waitResult_clicked()
     ui->End->setEnabled(false);
 
     BacGamble->state = incomeState;
+    for(int i = 0;i < incomeUids.length(); i++)
+    {
+        qDebug() << incomeUids.at(i).toHex();
+    }
 
     // QBrush(QColor(238, 59, 59))
 
@@ -628,24 +661,7 @@ void MainWindow::on_waitResult_clicked()
 
 void MainWindow::on_income_clicked()
 {
-    //    if(inIndex < incomeList.length()){
-    //        incomeList.at(inIndex++)->setBackgroundColor(QColor(255, 0, 0, 127));
 
-    //    }
-
-
-    //    else
-    //    {
-    //        ui->readyBet->setEnabled(false);
-    //        ui->startBet->setEnabled(false);
-    //        ui->waitResult->setEnabled(false);
-    //        ui->income->setEnabled(false);
-    //        ui->output->setEnabled(true);
-    //        ui->output->setFocus();
-    //        ui->output->setDefault(true);
-    //        ui->End->setEnabled(false);
-
-    //    }
 
     if(ui->realMoneyLabel->text() != ui->recMoneyLabel->text())
     {
@@ -654,13 +670,35 @@ void MainWindow::on_income_clicked()
 
     BacGamble->state = outputState;
 
+    ui->readyBet->setEnabled(false);
+    ui->startBet->setEnabled(false);
+    ui->waitResult->setEnabled(false);
+    ui->income->setEnabled(false);
+    ui->output->setEnabled(true);
+    ui->output->setFocus();
+    ui->output->setDefault(true);
+    ui->End->setEnabled(false);
+    outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+    winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+
+    reader->Set_ANT(1 << 11);
+    connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
+    inventoryTimer->start(50);
+
+
 }
 
 void MainWindow::on_output_clicked()
 {
+    if(outputList.at(outIndex)->text() != winList.at(outIndex)->text())
+    {
+       return;
+    }
+    outIndex++;
 
     if(outIndex < outputList.length()){
-        outputList.at(outIndex++)->setBackgroundColor(QColor(255, 255, 0, 127));
+        outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+        winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
 
 
     }
@@ -674,22 +712,18 @@ void MainWindow::on_output_clicked()
         ui->End->setEnabled(true);
         ui->End->setFocus();
         ui->End->setDefault(true);
+        BacGamble->state = GambleEnd;
     }
 
-    BacGamble->state = GambleEnd;
+
 }
 
 void MainWindow::on_End_clicked()
 {ui->readyBet->setEnabled(true);
-    ui->readyBet->setFocus();
-    ui->readyBet->setDefault(true);
-    ui->startBet->setEnabled(false);
-    ui->waitResult->setEnabled(false);
-    ui->income->setEnabled(false);
-    ui->output->setEnabled(false);
-    ui->End->setEnabled(false);
+
     resetItem();
     BacGamble->state = readybetState;
+
 
 }
 
@@ -752,28 +786,35 @@ void MainWindow::handleBankWin()
     ui->BankLabel->setPalette(winpe);
 
     outputList  <<   Bank->lossArea->items;
+    winList  <<   Bank->betArea->items;
     outTotalMVal  += Bank->betArea->totalMoneyItem->getMoney();
+    outputUids.append(Bank->betArea->totalMoneyItem->uidList);
+
     outTotalChips += Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Play->betArea->totalMoneyItem->uidList);
     inTotalChips +=Play->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bankpair->betArea->items.at(0);
     inTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bankpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bankpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Playpair->betArea->items.at(0);
     inTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Playpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Playpair->betArea->totalChipsItem->getChipsCount();
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
 
-    qDebug() << outTotalMVal;
-    qDebug() << inTotalMVal;
+
+
 
 
 }
@@ -787,24 +828,29 @@ void MainWindow::handlePlayWin()
 
     ui->PlayLabel->setPalette(winpe);
 
-    outputList << Play->lossArea->items.mid(0,3);
+    outputList << Play->lossArea->items;
+    winList << Play->betArea->items;
     outTotalMVal += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bankpair->betArea->items.at(0);
     inTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bankpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bankpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Playpair->betArea->items.at(0);
     inTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Playpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Playpair->betArea->totalChipsItem->getChipsCount();
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
 
@@ -820,23 +866,28 @@ void MainWindow::handleTieWin()
     ui->TieLabel->setPalette(winpe);
 
     outputList << Tie->lossArea->items.at(0);
+    winList << Tie->betArea->items.at(0);
     outTotalMVal += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Play->betArea->totalMoneyItem->uidList);
     inTotalChips +=Play->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bankpair->betArea->items.at(0);
     inTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bankpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bankpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Playpair->betArea->items.at(0);
     inTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Playpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Playpair->betArea->totalChipsItem->getChipsCount();
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
 
@@ -853,24 +904,29 @@ void MainWindow::handleBank_BankpairWin()
     ui->BankPairLabel->setPalette(winpe);
 
     outputList  <<   Bank->lossArea->items;
+    winList << Bank->betArea->items;
     outTotalMVal  += Bank->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bank->betArea->totalChipsItem->getChipsCount();
 
     outputList  <<   Bankpair->lossArea->items;
+    winList << Bankpair->betArea->items;
     outTotalMVal  += Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bankpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Play->betArea->totalMoneyItem->uidList);
     inTotalChips +=Play->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
 
     incomeList << Playpair->betArea->items.at(0);
     inTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Playpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Playpair->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -888,24 +944,29 @@ void MainWindow::handleBank_PlaypairWin()
     ui->PlayPairLabel->setPalette(winpe);
 
     outputList  <<   Bank->lossArea->items;
+    winList  <<   Bank->betArea->items;
     outTotalMVal  += Bank->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bank->betArea->totalChipsItem->getChipsCount();
 
     outputList  <<   Playpair->lossArea->items.at(0);
+    winList    << Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Play->betArea->totalMoneyItem->uidList);
     inTotalChips +=Play->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
 
     incomeList << Bankpair->betArea->items.at(0);
     inTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bankpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bankpair->betArea->totalChipsItem->getChipsCount();
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -925,14 +986,17 @@ void MainWindow::handleBank_Bankpair_PlaypairWin()
     ui->PlayPairLabel->setPalette(winpe);
 
     outputList  <<   Bank->lossArea->items;
+    winList     <<   Bank->betArea->items;
     outTotalMVal  += Bank->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bank->betArea->totalChipsItem->getChipsCount();
 
     outputList << Bankpair->lossArea->items.at(0);
+    winList    << Bankpair->betArea->items.at(0);
     outTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips +=Bankpair->betArea->totalChipsItem->getChipsCount();
 
-    outputList  <<   Playpair->lossArea->items;
+    outputList  <<   Playpair->lossArea->items.at(0);
+    winList     <<  Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
 
@@ -940,10 +1004,12 @@ void MainWindow::handleBank_Bankpair_PlaypairWin()
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Play->betArea->totalMoneyItem->uidList);
     inTotalChips +=Play->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -963,24 +1029,29 @@ void MainWindow::handlePlay_BankpairWin()
     ui->BankPairLabel->setPalette(winpe);
 
     outputList  <<   Play->lossArea->items;
+    winList     <<   Play->betArea->items;
     outTotalMVal  += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
 
     outputList  <<   Bankpair->lossArea->items.at(0);
+    winList     <<   Bankpair->betArea->items.at(0);
     outTotalMVal  += Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bankpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
 
     incomeList << Playpair->betArea->items.at(0);
     inTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Playpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Playpair->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -998,24 +1069,29 @@ void MainWindow::handlePlay_PlaypairWin()
     ui->PlayPairLabel->setPalette(winpe);
 
     outputList  <<   Play->lossArea->items;
+    winList     <<   Play->betArea->items;
     outTotalMVal  += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
 
     outputList  <<   Playpair->lossArea->items.at(0);
+    winList     <<   Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
 
     incomeList << Bankpair->betArea->items.at(0);
     inTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bankpair->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bankpair->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -1034,23 +1110,28 @@ void MainWindow::handlePlay_Bankpair_PlaypairWin()
     ui->PlayPairLabel->setPalette(winpe);
 
     outputList  <<   Play->lossArea->items;
+    winList     <<   Play->betArea->items;
     outTotalMVal  += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
 
-    outputList << Bankpair->lossArea->items.at(0);
+    outputList  << Bankpair->lossArea->items.at(0);
+    winList    << Bankpair->betArea->items.at(0);
     outTotalMVal  +=Bankpair->lossArea->totalMoneyItem->getMoney();
     outTotalMVal +=Bankpair->lossArea->totalChipsItem->getChipsCount();
 
     outputList  <<   Playpair->lossArea->items.at(0);
+    winList  <<   Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -1070,23 +1151,28 @@ void MainWindow::handleTie_BankpairWin()
     ui->BankPairLabel->setPalette(winpe);
 
     outputList  <<   Tie->lossArea->items;
+    winList  <<   Tie->betArea->items;
     outTotalMVal  += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
 
     outputList << Bankpair->lossArea->items.at(0);
+    winList    << Bankpair->betArea->items.at(0);
     outTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalMVal +=Bankpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Tie->betArea->items.at(0);
     inTotalMVal  +=Tie->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Tie->betArea->totalMoneyItem->uidList);
     inTotalChips +=Tie->betArea->totalChipsItem->getChipsCount();
 
     incomeList  <<  Playpair->lossArea->items.at(0);
     inTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Playpair->betArea->totalMoneyItem->uidList);
     inTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -1103,23 +1189,28 @@ void MainWindow::handleTie_PlaypairWin()
     ui->PlayPairLabel->setPalette(winpe);
 
     outputList  <<   Tie->lossArea->items.at(0);
+    winList     <<   Tie->betArea->items.at(0);
     outTotalMVal  += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
 
     outputList << Playpair->lossArea->items.at(0);
+    winList    << Playpair->betArea->items.at(0);
     outTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
     outTotalMVal +=Playpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Play->betArea->totalMoneyItem->uidList);
     inTotalChips +=Play->betArea->totalChipsItem->getChipsCount();
 
     incomeList  <<  Bankpair->lossArea->items.at(0);
     inTotalMVal  += Bankpair->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bankpair->betArea->totalMoneyItem->uidList);
     inTotalChips += Bankpair->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));
@@ -1139,23 +1230,28 @@ void MainWindow::handleTie_Bankpair_PlaypairWin()
     ui->PlayPairLabel->setPalette(winpe);
 
     outputList  <<   Tie->lossArea->items.at(0);
+    winList     <<   Tie->betArea->items.at(0);
     outTotalMVal  += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
 
     outputList   <<  Bankpair->lossArea->items.at(0);
+    winList      <<  Bankpair->betArea->items.at(0);
     outTotalMVal  += Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bankpair->betArea->totalChipsItem->getChipsCount();
 
     outputList << Playpair->lossArea->items.at(0);
+    winList    << Playpair->betArea->items.at(0);
     outTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
     outTotalMVal +=Playpair->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Bank->betArea->totalMoneyItem->uidList);
     inTotalChips +=Bank->betArea->totalChipsItem->getChipsCount();
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
+    incomeUids.append(Play->betArea->totalMoneyItem->uidList);
     inTotalChips +=Play->betArea->totalChipsItem->getChipsCount();
 
     ui->realMoneyLabel->setText(QString::number(inTotalMVal));

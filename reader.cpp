@@ -44,7 +44,6 @@ void Reader::readMyCom()
 
 {
 
-    qDebug()<<"readmycom";
    // static const char idecode[] = {0x03,0x00,0x01,0xf0,0x01,0x07,0x05,0x89};
     static const char endcode[] = {0x05,0x07,0x01,0xF0,0x01,0x00,0x03,0x89};
 
@@ -53,13 +52,6 @@ void Reader::readMyCom()
     QByteArray endcodebd = QByteArray::fromRawData(endcode ,sizeof(endcode));
     QByteArray configbackbd = QByteArray::fromRawData(configback ,sizeof(configback));
     QByteArray bd = readAll();
-    qDebug() << bd.toHex();
-
-    //      if(bytesAvailable() > 17)
-    //      {
-    //        bd = read(17);
-
-    //      }
 
 
     Frames.append(bd);
@@ -67,6 +59,18 @@ void Reader::readMyCom()
 //    if(Frames.right(8) == idecodebd)
 //    {
 //        return;
+
+
+//    }
+
+//    for(int i = 0; i < nextdata.length()-8; i = i + 17)
+//    {
+//        if(!nextList.contains(nextdata.mid(i,17)))
+//        {
+//             nextList << nextdata.mid(i,17);
+//             nextID << nextdata.mid(i+7,8);
+//         }
+
 //    }
     if(Frames.right(8) == endcodebd && currentstate == readuid  )
     {
@@ -81,7 +85,6 @@ void Reader::readMyCom()
     else if(Frames.right(8) == configbackbd && currentstate == setAnt)
     {
 
-//        qDebug() << "setANT";
         Frames.clear();
         reset();
         emit SetAntOk();
@@ -90,10 +93,6 @@ void Reader::readMyCom()
     {
         reset();
     }
-
-    //    times++;
-
-    //    qDebug() << "times: " << times;
 
 }
 
@@ -111,7 +110,7 @@ QByteArray  Reader::write_cmd(quint16 cmd, QByteArray Data)
     bd.append((crc16 >> 8 ) & 0x00ff);
     bd.prepend(SOF);
 
-    //   qDebug() << bd.toHex();
+
     write(bd);
     return bd;
 
@@ -181,6 +180,8 @@ quint16 Reader::getAnt()
 {
    return resultAnt;
 }
+
+
 void Reader::DecodeChip(QByteArray Frames)
 {
 

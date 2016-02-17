@@ -78,7 +78,7 @@ public:
     //   QByteArray getUids();
     QList<QByteArray> getUids();
 
-
+    QList<QByteArray> uidList;
 private:
     quint16 Number;
     quint16 AntNum;
@@ -86,7 +86,7 @@ private:
     quint32 count;
     quint32 uidCount;
     //QByteArray uid;
-    QList<QByteArray> uidList;
+
 };
 
 //QMap<BaccaratAreaType,BaccaratArea*> areamap;
