@@ -72,6 +72,8 @@ private:
     Ui::MainWindow *ui;
     QList<QByteArray> outputUids;
     QList<QByteArray> incomeUids;
+    QList<QByteArray> getUids;
+    QList<QByteArray> putUids;
     QTimer *inventoryTimer;
     BaccaratGamble *BacGamble;
 
@@ -98,7 +100,7 @@ private:
     quint32 currentIndex;
     virtual void keyReleaseEvent (QKeyEvent * event);
     virtual void closeEvent( QCloseEvent *event );
- /*=============================================================================*/
+    /*=============================================================================*/
     BaccaratArea *Bank;
     BaccaratArea *Play;
     BaccaratArea *Tie;
@@ -127,7 +129,7 @@ private:
     BaccaratGambleState getBaccaratGambleState();
 
     void nextItem();
-/*=============================================================================*/
+    /*=============================================================================*/
     Reader  *reader;
     QList<int>keyList;
     void resetItem();

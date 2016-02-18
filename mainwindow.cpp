@@ -388,38 +388,53 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 {
 
 
-
+    qDebug() << "ReadUid";
     static int num;
-    int count = list.length();
+
     QByteArray uid;
+    QList<QByteArray> uidList ;
+    int count = list.length();
+    uid.clear();
     int moneyVal=0;;
     int moneySum=0;
-    for(int i = 0; i  < count; i++)
-    {
 
-
-
-        uid = SwaptoDataBaseBytes(list.at(i)).toHex();
-       // qDebug() << uid;
-
-        moneyVal = getMoneyVal(uid);
-        moneySum+=moneyVal;
-
-
-    }
     if(BacGamble->state == startbetState)
     {
+        for(int i = 0; i  < count; i++)
+        {
 
+
+            uid =  SwaptoDataBaseBytes(list.at(i));
+
+            uidList << uid;
+            moneyVal = getMoneyVal(uid.toHex());
+            moneySum+=moneyVal;
+
+        }
         currentItem->SetMoney(moneySum);
         currentItem->SetCount(count);
-        currentItem->SetUids(list);
+        currentItem->SetUids(uidList);
         currentItem->setText(QString::number(moneySum));
         scheduleNextBet();
     }
 
     if(BacGamble->state == incomeState)
     {
-//        qDebug() << moneySum;
+
+        for(int i = 0; i  < count; i++)
+        {
+
+
+            uid =  SwaptoDataBaseBytes(list.at(i));
+            if(incomeUids.contains(uid))
+            {
+
+                //  uidList << uid;
+                moneyVal = getMoneyVal(uid.toHex());
+                moneySum+=moneyVal;
+            }
+        }
+
         ui->recMoneyLabel->setText(QString::number(moneySum));
         inventoryTimer->start(50);
 
@@ -427,12 +442,28 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 
     if(BacGamble->state == outputState)
     {
-       outputList.at(outIndex)->SetMoney(moneySum);
-       outputList.at(outIndex)->SetCount(count);
-       outputList.at(outIndex)->SetUids(list);
-       outputList.at(outIndex)->setText(QString::number(moneySum));
+        qDebug() << "payfor";
+        for(int i = 0; i  < count; i++)
+        {
 
-       inventoryTimer->start(50);
+
+            uid =  SwaptoDataBaseBytes(list.at(i));
+            if(!putUids.contains(uid))
+            {
+
+                uidList << uid;
+               //putUids << uid;
+                moneyVal = getMoneyVal(uid.toHex());
+                moneySum+=moneyVal;
+            }
+
+        }
+        outputList.at(outIndex)->SetMoney(moneySum);
+        outputList.at(outIndex)->SetCount(count);
+        outputList.at(outIndex)->SetUids(uidList);
+        outputList.at(outIndex)->setText(QString::number(moneySum));
+
+        inventoryTimer->start(50);
 
     }
 
@@ -447,12 +478,12 @@ QByteArray MainWindow::SwaptoDataBaseBytes(QByteArray bd)
         temp.append(bd.at(i));
 
     }
+    //  qDebug() << temp.toHex();
     return temp;
 }
 
 int MainWindow::getMoneyVal(QString uid)
 {
-
 
     int moneyval;
     QSqlQuery query;
@@ -636,8 +667,10 @@ void MainWindow::on_waitResult_clicked()
     {
         incomeList.at(i)->setBackgroundColor(QColor(255, 0, 0, 127));
     }
+
     reader->Set_ANT(1 << 11);
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
+
     inventoryTimer->start(50);
     ui->readyBet->setEnabled(false);
     ui->startBet->setEnabled(false);
@@ -692,8 +725,9 @@ void MainWindow::on_output_clicked()
 {
     if(outputList.at(outIndex)->text() != winList.at(outIndex)->text())
     {
-       return;
+        return;
     }
+    putUids.append(outputList.at(outIndex)->uidList);
     outIndex++;
 
     if(outIndex < outputList.length()){

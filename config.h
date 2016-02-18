@@ -3,7 +3,7 @@
 
 #define SERIAL "/dev/ttyS1"
 
-#define HOSTNAME  "192.168.1.74"
+#define HOSTNAME  "192.168.1.72"
 #define PORT       3306
 #define DATABASENAME "bargainingchipsys"
 #define USERNAME      "test"
