@@ -8,4 +8,5 @@
 #define DATABASENAME "bargainingchipsys"
 #define USERNAME      "test"
 #define PASSWD        "123"
+#define deskid         1
 #endif // CONFIG_H

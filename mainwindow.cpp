@@ -150,22 +150,7 @@ void MainWindow::keyReleaseEvent (QKeyEvent *event)
 
 }
 
-//enum BaccaratResultType
-//{
-//    bankwin,
-//    playwin,
-//    tiewin,
-//    bank_bankpair_win,
-//    bank_playpair_win,
-//    bank_bankpair_playpair_win,
-//    play_bankpair_win,
-//    play_playpair_win,
-//    play_bankpair_playwin_win,
-//    tie_bankpair_win,
-//    tie_playpair_win,
-//    tie_bankpair_playwin_win
 
-//};
 
 void MainWindow::handleResult(int key)
 {
@@ -452,7 +437,7 @@ void MainWindow::ReadUid(QList<QByteArray> list)
             {
 
                 uidList << uid;
-               //putUids << uid;
+                //putUids << uid;
                 moneyVal = getMoneyVal(uid.toHex());
                 moneySum+=moneyVal;
             }
@@ -700,7 +685,9 @@ void MainWindow::on_income_clicked()
     {
         return;
     }
-
+    qDebug() << "fetch money";
+    qDebug() << inTotalMVal;
+    submitWin(inTotalMVal);
     BacGamble->state = outputState;
 
     ui->readyBet->setEnabled(false);
@@ -738,6 +725,7 @@ void MainWindow::on_output_clicked()
     }
     else
     {
+        submiLost(outTotalMVal);
         ui->readyBet->setEnabled(false);
         ui->startBet->setEnabled(false);
         ui->waitResult->setEnabled(false);
@@ -1293,6 +1281,51 @@ void MainWindow::handleTie_Bankpair_PlaypairWin()
 
 }
 
+
+int MainWindow::submitWin(int moneywin)
+{
+    // insert into gamblingrecord values(0,2,'',1,0,500, '2016-02-18 17:01:09');
+    //   insert into gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime) values(2,'',1,0,500, '2016-02-18 17:01:09');
+ //   QString StarBetTime = '2013-02-18 17:01:09';
+    QSqlQuery query;
+
+    query.prepare("insert into gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime) values(:type,:userid,:deskid,:moneywin,:moneylost,:happentime)");
+    query.bindValue(":type",1);
+    query.bindValue(":userid", " ");
+    query.bindValue(":deskid", deskid);
+    query.bindValue(":moneywin", moneywin);
+    query.bindValue(":moneylost",0);
+    query.bindValue(":happentime","2013-02-18 17:01:09");
+    if(!query.exec())
+    {
+        qDebug() << "fail";
+    }
+    else
+    {
+        qDebug() << "succees";
+    }
+
+    return 0;
+}
+
+int MainWindow::submiLost(int moneylost)
+{
+  //  QString StarBetTime = '2016-02-18 17:01:09';
+    QSqlQuery query;
+    query.prepare("INSERT INTO gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime)"
+                  "VALUES (:type, :userid, :deskid,:moneywin,:moneylost,:happentime)");
+    query.bindValue(":type",2);
+    query.bindValue(":userid", "");
+    query.bindValue(":deskid", deskid);
+    query.bindValue(":moneywin", 0);
+    query.bindValue(":moneylost",moneylost);
+    query.bindValue(":happentime","2013-02-18 17:01:09");
+
+    query.exec();
+
+    return 0;
+
+}
 void MainWindow::closeEvent ( QCloseEvent *event )
 {
 

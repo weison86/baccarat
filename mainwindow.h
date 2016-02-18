@@ -129,6 +129,9 @@ private:
     BaccaratGambleState getBaccaratGambleState();
 
     void nextItem();
+
+    int submitWin(int moneywin);
+    int submiLost(int moneylost);
     /*=============================================================================*/
     Reader  *reader;
     QList<int>keyList;
