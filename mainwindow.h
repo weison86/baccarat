@@ -137,7 +137,7 @@ private:
     QList<int>keyList;
     void resetItem();
     void handleBaccaratResult();
-
+    QString StartBetTime;
     QPalette winpe;
     QPalette defpe;
 };

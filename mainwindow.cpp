@@ -593,6 +593,8 @@ void MainWindow::resetItem()
 void MainWindow::on_readyBet_clicked()
 {
 
+    QDateTime time = QDateTime::currentDateTime();//获取系统现在的时间
+    StartBetTime = time.toString("yyyy-MM-dd hh:mm:ss"); //设置显示格式
 
     ui->readyBet->setEnabled(false);
     ui->startBet->setEnabled(true);
@@ -1295,17 +1297,33 @@ int MainWindow::submitWin(int moneywin)
     query.bindValue(":deskid", deskid);
     query.bindValue(":moneywin", moneywin);
     query.bindValue(":moneylost",0);
-    query.bindValue(":happentime","2013-02-18 17:01:09");
+    query.bindValue(":happentime",StartBetTime);
     if(!query.exec())
     {
         qDebug() << "fail";
+        return 0;
     }
     else
     {
         qDebug() << "succees";
     }
 
-    return 0;
+    query.prepare("select @@IDENTITY");
+    if(!query.exec())
+    {
+       qDebug() << "select ID fail";
+       return 0;
+    }
+    else
+    {
+      query.next();
+      int id = query.value(0).toInt();
+      qDebug() << id;
+      return id;
+
+   }
+
+
 }
 
 int MainWindow::submiLost(int moneylost)
@@ -1319,11 +1337,34 @@ int MainWindow::submiLost(int moneylost)
     query.bindValue(":deskid", deskid);
     query.bindValue(":moneywin", 0);
     query.bindValue(":moneylost",moneylost);
-    query.bindValue(":happentime","2013-02-18 17:01:09");
+    query.bindValue(":happentime",StartBetTime);
+    if(!query.exec())
+    {
+        qDebug() << "fail";
+        return 0;
+    }
+    else
+    {
+        qDebug() << "succees";
 
-    query.exec();
+    }
 
-    return 0;
+    query.prepare("select @@IDENTITY");
+    if(!query.exec())
+    {
+       qDebug() << "select ID fail";
+       return 0;
+    }
+    else
+    {
+      query.next();
+      int id = query.value(0).toInt();
+      qDebug() << id;
+      return id;
+
+   }
+
+
 
 }
 void MainWindow::closeEvent ( QCloseEvent *event )
