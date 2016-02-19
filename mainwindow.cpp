@@ -107,8 +107,6 @@ void MainWindow::keyReleaseEvent (QKeyEvent *event)
     int k;
 
     k = event->key();
-    //  int key;
-
     switch(k)
     {
     case Qt::Key_0:
@@ -657,7 +655,7 @@ void MainWindow::on_waitResult_clicked()
         incomeList.at(i)->setBackgroundColor(QColor(255, 0, 0, 127));
     }
 
-    reader->Set_ANT(1 << 11);
+    reader->Set_ANT(1 << BacAnt);
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
 
     inventoryTimer->start(50);
@@ -707,7 +705,7 @@ void MainWindow::on_income_clicked()
     outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
     winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
 
-    reader->Set_ANT(1 << 11);
+    reader->Set_ANT(1 << BacAnt);
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
     inventoryTimer->start(50);
 
@@ -1324,7 +1322,7 @@ int MainWindow::submitWin(int moneywin)
 
     query.prepare("insert into gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime) values(:type,:userid,:deskid,:moneywin,:moneylost,:happentime)");
     query.bindValue(":type",1);
-    query.bindValue(":userid", " ");
+    query.bindValue(":userid", userid);
     query.bindValue(":deskid", deskid);
     query.bindValue(":moneywin", moneywin);
     query.bindValue(":moneylost",0);
@@ -1364,7 +1362,7 @@ int MainWindow::submitLost(int moneylost)
     query.prepare("INSERT INTO gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime)"
                   "VALUES (:type, :userid, :deskid,:moneywin,:moneylost,:happentime)");
     query.bindValue(":type",2);
-    query.bindValue(":userid", "");
+    query.bindValue(":userid", userid);
     query.bindValue(":deskid", deskid);
     query.bindValue(":moneywin", 0);
     query.bindValue(":moneylost",moneylost);

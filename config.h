@@ -9,4 +9,6 @@
 #define USERNAME      "test"
 #define PASSWD        "123"
 #define deskid         1
+#define BacAnt         (11)
+#define userid         ""
 #endif // CONFIG_H
