@@ -14,12 +14,12 @@ bool connectdatabase(QString hostname,int port ,QString databasename,QString use
     ChipDataBase.setPassword(passwd);
     if( !ChipDataBase.open() )
     {
-        qDebug()<<"this,warning,failure";
+        qDebug()<<"connect DataBase fail";
         return false;
     }
     else
     {
-        qDebug()<<"this,ok,success";
+        qDebug()<<"connect DataBase Success";
         return true;
     }
 

@@ -105,6 +105,11 @@ void MainWindow::initShowLabel()
 void MainWindow::keyReleaseEvent (QKeyEvent *event)
 {
     int k;
+    if( event->key() == Qt::Key_Escape)
+    {
+        reset();
+        return ;
+    }
     if(BacGamble->state == incomeState)
     {
 
@@ -738,7 +743,7 @@ void MainWindow::on_income_clicked()
     ui->output->setDefault(true);
     ui->End->setEnabled(false);
 
-
+    IngoreSpace();
     outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
     winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
 
@@ -746,6 +751,23 @@ void MainWindow::on_income_clicked()
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
     inventoryTimer->start(50);
 
+
+}
+
+void MainWindow::IngoreSpace()
+{
+
+    if(outIndex >= winList.length())
+        return;
+
+    while(winList.at(outIndex)->text() == "")
+    {
+        outIndex++;
+        if(outIndex >= winList.length()){
+          //  outIndex = winList.length() - 1;
+            return;
+        }
+    }
 
 }
 
@@ -757,10 +779,14 @@ void MainWindow::on_output_clicked()
     }
     putUids.append(outputList.at(outIndex)->uidList);
     outIndex++;
+    IngoreSpace();
+
 
     if(outIndex < outputList.length()){
-        outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
-        winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+   //     IngoreSpace();
+//        if();
+      outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+      winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
 
 
     }

@@ -46,6 +46,8 @@ public:
     QByteArray SwaptoDataBaseBytes(QByteArray bd);
     int getMoneyVal(QString uid);
 
+    void IngoreSpace();
+
 
 
 
