@@ -573,7 +573,7 @@ void MainWindow::reset()
         betList.at(i)->setText("");
         betList.at(i)->clearData();
 
-        betList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
+        betList.at(i)->setBackgroundColor(DEF_COR_ITEM );
         //        betList.at(i)->typearea->totalChipsItem->setText("0");
         //        betList.at(i)->typearea->totalMoneyItem->setText("0");
     }
@@ -584,7 +584,7 @@ void MainWindow::reset()
 
         lossList.at(i)->setText("");
         lossList.at(i)->clearData();
-        lossList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
+        lossList.at(i)->setBackgroundColor(DEF_COR_ITEM );
         //        lossList.at(i)->typearea->totalChipsItem->setText("0");
         //        lossList.at(i)->typearea->totalMoneyItem->setText("0");
     }
@@ -694,7 +694,7 @@ void MainWindow::on_waitResult_clicked()
         incomeList.at(i)->setBackgroundColor(QColor(255, 0, 0, 127));
     }
 
-    reader->Set_ANT(1 << BacAnt);
+    reader->Set_ANT(1 << M_ANT);
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
 
     inventoryTimer->start(50);
@@ -747,7 +747,7 @@ void MainWindow::on_income_clicked()
     outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
     winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
 
-    reader->Set_ANT(1 << BacAnt);
+    reader->Set_ANT(1 << M_ANT);
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
     inventoryTimer->start(50);
 
@@ -1384,9 +1384,9 @@ int MainWindow::submitWin(int moneywin)
     QSqlQuery query;
 
     query.prepare("insert into gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime) values(:type,:userid,:deskid,:moneywin,:moneylost,:happentime)");
-    query.bindValue(":type",1);
-    query.bindValue(":userid", userid);
-    query.bindValue(":deskid", deskid);
+    query.bindValue(":type",WIN_TYPE);
+    query.bindValue(":userid", USER_ID);
+    query.bindValue(":deskid", DESK_ID);
     query.bindValue(":moneywin", moneywin);
     query.bindValue(":moneylost",0);
     query.bindValue(":happentime",StartBetTime);
@@ -1421,16 +1421,16 @@ int MainWindow::submitWin(int moneywin)
 int MainWindow::submitLost(int moneylost)
 {
     //  QString StarBetTime = '2016-02-18 17:01:09';
-    QSqlQuery query;
+    QSqlQuery query ;
     query.prepare("INSERT INTO gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime)"
                   "VALUES (:type, :userid, :deskid,:moneywin,:moneylost,:happentime)");
-    query.bindValue(":type",2);
-    query.bindValue(":userid", userid);
-    query.bindValue(":deskid", deskid);
-    query.bindValue(":moneywin", 0);
-    query.bindValue(":moneylost",moneylost);
-    query.bindValue(":happentime",StartBetTime);
-    if(!query.exec())
+    query .bindValue(":type",LOST_TYPE);
+    query .bindValue(":userid", USER_ID);
+    query .bindValue(":deskid", DESK_ID);
+    query .bindValue(":moneywin", 0);
+    query .bindValue(":moneylost",moneylost);
+    query .bindValue(":happentime",StartBetTime);
+    if(!query .exec())
     {
         qDebug() << "submit Lost Money fail";
         return 0;
@@ -1491,18 +1491,12 @@ void MainWindow::BacktowaitResultState()
 
     for(int i =0;i < betList.length(); i++)
     {
-        //  betList.at(i)->setText("0");
-        betList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-        //        betList.at(i)->typearea->totalChipsItem->setText("0");
-        //        betList.at(i)->typearea->totalMoneyItem->setText("0");
+        betList.at(i)->setBackgroundColor(DEF_COR_ITEM);
     }
 
     for(int i =0;i < lossList.length(); i++)
     {
-        //  lossList.at(i)->setText("0");
-        lossList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-        // lossList.at(i)->typearea->totalChipsItem->setText("0");
-        // lossList.at(i)->typearea->totalMoneyItem->setText("0");
+        lossList.at(i)->setBackgroundColor(DEF_COR_ITEM);
     }
     outputList.clear();
     winList.clear();
@@ -1525,11 +1519,6 @@ void MainWindow::BacktowaitResultState()
     ui->income->setEnabled(false);
     ui->output->setEnabled(false);
     ui->End->setEnabled(false);
-    //disconnect(this,)
-    //  inventoryTimer->disconnect(this);
-
-    // disconnect(inventory,tim);
-    //inventoryTimer->stop();
 
     BacGamble->state = waitResultState;
 }
