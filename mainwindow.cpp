@@ -427,13 +427,13 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 
     if(BacGamble->state == outputState)
     {
-        qDebug() << "payfor";
+
         for(int i = 0; i  < count; i++)
         {
 
 
             uid =  SwaptoDataBaseBytes(list.at(i));
-            if(!putUids.contains(uid))
+            if(!putUids.contains(uid) && !outputUids.contains(uid))
             {
 
                 uidList << uid;
@@ -586,7 +586,9 @@ void MainWindow::resetItem()
     incomeUids.clear();
     outputUids.clear();
 
-
+    currentwinList.clear();
+    currentlossList.clear();
+    keyList.clear();
 
 }
 
@@ -856,6 +858,7 @@ void MainWindow::handlePlayWin()
     winList << Play->betArea->items;
     outTotalMVal += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Play->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -893,6 +896,7 @@ void MainWindow::handleTieWin()
     winList << Tie->betArea->items.at(0);
     outTotalMVal += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Tie->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -931,11 +935,13 @@ void MainWindow::handleBank_BankpairWin()
     winList << Bank->betArea->items;
     outTotalMVal  += Bank->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bank->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bank->betArea->totalMoneyItem->uidList);
 
     outputList  <<   Bankpair->lossArea->items;
     winList << Bankpair->betArea->items;
     outTotalMVal  += Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bankpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bankpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
@@ -971,11 +977,13 @@ void MainWindow::handleBank_PlaypairWin()
     winList  <<   Bank->betArea->items;
     outTotalMVal  += Bank->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bank->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bank->betArea->totalMoneyItem->uidList);
 
     outputList  <<   Playpair->lossArea->items.at(0);
     winList    << Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Playpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Play->betArea->items;
     inTotalMVal  +=Play->betArea->totalMoneyItem->getMoney();
@@ -1013,16 +1021,19 @@ void MainWindow::handleBank_Bankpair_PlaypairWin()
     winList     <<   Bank->betArea->items;
     outTotalMVal  += Bank->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bank->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bank->betArea->totalMoneyItem->uidList);
 
     outputList << Bankpair->lossArea->items.at(0);
     winList    << Bankpair->betArea->items.at(0);
     outTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips +=Bankpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bankpair->betArea->totalMoneyItem->uidList);
 
     outputList  <<   Playpair->lossArea->items.at(0);
     winList     <<  Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Playpair->betArea->totalMoneyItem->uidList);
 
 
 
@@ -1056,11 +1067,13 @@ void MainWindow::handlePlay_BankpairWin()
     winList     <<   Play->betArea->items;
     outTotalMVal  += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Play->betArea->totalMoneyItem->uidList);
 
     outputList  <<   Bankpair->lossArea->items.at(0);
     winList     <<   Bankpair->betArea->items.at(0);
     outTotalMVal  += Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bankpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bankpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -1096,11 +1109,13 @@ void MainWindow::handlePlay_PlaypairWin()
     winList     <<   Play->betArea->items;
     outTotalMVal  += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Play->betArea->totalMoneyItem->uidList);
 
     outputList  <<   Playpair->lossArea->items.at(0);
     winList     <<   Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Playpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -1137,16 +1152,19 @@ void MainWindow::handlePlay_Bankpair_PlaypairWin()
     winList     <<   Play->betArea->items;
     outTotalMVal  += Play->betArea->totalMoneyItem->getMoney();
     outTotalChips += Play->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Play->betArea->totalMoneyItem->uidList);
 
     outputList  << Bankpair->lossArea->items.at(0);
     winList    << Bankpair->betArea->items.at(0);
     outTotalMVal  +=Bankpair->lossArea->totalMoneyItem->getMoney();
     outTotalMVal +=Bankpair->lossArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bankpair->betArea->totalMoneyItem->uidList);
 
     outputList  <<   Playpair->lossArea->items.at(0);
     winList  <<   Playpair->betArea->items.at(0);
     outTotalMVal  += Playpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Playpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Playpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -1178,11 +1196,13 @@ void MainWindow::handleTie_BankpairWin()
     winList  <<   Tie->betArea->items;
     outTotalMVal  += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Tie->betArea->totalMoneyItem->uidList);
 
     outputList << Bankpair->lossArea->items.at(0);
     winList    << Bankpair->betArea->items.at(0);
     outTotalMVal  +=Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalMVal +=Bankpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bankpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -1216,11 +1236,13 @@ void MainWindow::handleTie_PlaypairWin()
     winList     <<   Tie->betArea->items.at(0);
     outTotalMVal  += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Tie->betArea->totalMoneyItem->uidList);
 
     outputList << Playpair->lossArea->items.at(0);
     winList    << Playpair->betArea->items.at(0);
     outTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
     outTotalMVal +=Playpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Playpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -1257,16 +1279,19 @@ void MainWindow::handleTie_Bankpair_PlaypairWin()
     winList     <<   Tie->betArea->items.at(0);
     outTotalMVal  += Tie->betArea->totalMoneyItem->getMoney();
     outTotalChips += Tie->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Tie->betArea->totalMoneyItem->uidList);
 
     outputList   <<  Bankpair->lossArea->items.at(0);
     winList      <<  Bankpair->betArea->items.at(0);
     outTotalMVal  += Bankpair->betArea->totalMoneyItem->getMoney();
     outTotalChips += Bankpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Bankpair->betArea->totalMoneyItem->uidList);
 
     outputList << Playpair->lossArea->items.at(0);
     winList    << Playpair->betArea->items.at(0);
     outTotalMVal  +=Playpair->betArea->totalMoneyItem->getMoney();
     outTotalMVal +=Playpair->betArea->totalChipsItem->getChipsCount();
+    outputUids.append(Playpair->betArea->totalMoneyItem->uidList);
 
     incomeList << Bank->betArea->items;
     inTotalMVal  +=Bank->betArea->totalMoneyItem->getMoney();
@@ -1288,7 +1313,7 @@ int MainWindow::submitWin(int moneywin)
 {
     // insert into gamblingrecord values(0,2,'',1,0,500, '2016-02-18 17:01:09');
     //   insert into gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime) values(2,'',1,0,500, '2016-02-18 17:01:09');
- //   QString StarBetTime = '2013-02-18 17:01:09';
+    //   QString StarBetTime = '2013-02-18 17:01:09';
     QSqlQuery query;
 
     query.prepare("insert into gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime) values(:type,:userid,:deskid,:moneywin,:moneylost,:happentime)");
@@ -1311,24 +1336,24 @@ int MainWindow::submitWin(int moneywin)
     query.prepare("select @@IDENTITY");
     if(!query.exec())
     {
-       qDebug() << "select ID fail";
-       return 0;
+        qDebug() << "select ID fail";
+        return 0;
     }
     else
     {
-      query.next();
-      int id = query.value(0).toInt();
-      qDebug() << id;
-      return id;
+        query.next();
+        int id = query.value(0).toInt();
+        qDebug() << id;
+        return id;
 
-   }
+    }
 
 
 }
 
 int MainWindow::submiLost(int moneylost)
 {
-  //  QString StarBetTime = '2016-02-18 17:01:09';
+    //  QString StarBetTime = '2016-02-18 17:01:09';
     QSqlQuery query;
     query.prepare("INSERT INTO gamblingrecord (type,userid,deskid,moneywin,moneylost,happentime)"
                   "VALUES (:type, :userid, :deskid,:moneywin,:moneylost,:happentime)");
@@ -1352,17 +1377,17 @@ int MainWindow::submiLost(int moneylost)
     query.prepare("select @@IDENTITY");
     if(!query.exec())
     {
-       qDebug() << "select ID fail";
-       return 0;
+        qDebug() << "select ID fail";
+        return 0;
     }
     else
     {
-      query.next();
-      int id = query.value(0).toInt();
-      qDebug() << id;
-      return id;
+        query.next();
+        int id = query.value(0).toInt();
+        qDebug() << id;
+        return id;
 
-   }
+    }
 
 
 
