@@ -684,14 +684,16 @@ void MainWindow::on_waitResult_clicked()
 void MainWindow::on_income_clicked()
 {
 
-
+    int key;
     if(ui->realMoneyLabel->text() != ui->recMoneyLabel->text())
     {
         return;
     }
     qDebug() << "fetch money";
     qDebug() << inTotalMVal;
-    submitWin(inTotalMVal);
+    key = submitWin(inTotalMVal);
+    if(key !=0)
+       submitUids(key,incomeUids);
     BacGamble->state = outputState;
 
     ui->readyBet->setEnabled(false);
@@ -729,7 +731,11 @@ void MainWindow::on_output_clicked()
     }
     else
     {
-        submiLost(outTotalMVal);
+        int key;
+
+        key = submitLost(outTotalMVal);
+        if(key !=0)
+            submitUids(key,outputUids);
         ui->readyBet->setEnabled(false);
         ui->startBet->setEnabled(false);
         ui->waitResult->setEnabled(false);
@@ -1325,7 +1331,7 @@ int MainWindow::submitWin(int moneywin)
     query.bindValue(":happentime",StartBetTime);
     if(!query.exec())
     {
-        qDebug() << "fail";
+        qDebug() << "submit WinMoney fail";
         return 0;
     }
     else
@@ -1351,7 +1357,7 @@ int MainWindow::submitWin(int moneywin)
 
 }
 
-int MainWindow::submiLost(int moneylost)
+int MainWindow::submitLost(int moneylost)
 {
     //  QString StarBetTime = '2016-02-18 17:01:09';
     QSqlQuery query;
@@ -1365,12 +1371,12 @@ int MainWindow::submiLost(int moneylost)
     query.bindValue(":happentime",StartBetTime);
     if(!query.exec())
     {
-        qDebug() << "fail";
+        qDebug() << "submit Lost Money fail";
         return 0;
     }
     else
     {
-        qDebug() << "succees";
+        qDebug() << "submit Lost Money succees";
 
     }
 
@@ -1386,6 +1392,32 @@ int MainWindow::submiLost(int moneylost)
         int id = query.value(0).toInt();
         qDebug() << id;
         return id;
+
+    }
+
+
+
+}
+
+int MainWindow::submitUids(int key,QList<QByteArray>uids)
+{
+    QString uid;
+    QSqlQuery query;
+    for(int i = 0; i < uids.length(); i++){
+        uid = uids.at(i).toHex();
+        query.prepare("INSERT INTO gamblingrecordex (GamblingRecordId,Uid)"
+                      "VALUES (:GamblingRecordId,:Uid)");
+        query.bindValue(":GamblingRecordId",key);
+        query.bindValue("Uid", uid);
+        if(!query.exec())
+        {
+            qDebug() << "submit uid fail";
+            return 0;
+        }
+        else
+        {
+            qDebug() << "submit uid success";
+        }
 
     }
 

@@ -131,7 +131,8 @@ private:
     void nextItem();
 
     int submitWin(int moneywin);
-    int submiLost(int moneylost);
+    int submitLost(int moneylost);
+    int submitUids(int key,QList<QByteArray>uids);
     /*=============================================================================*/
     Reader  *reader;
     QList<int>keyList;
