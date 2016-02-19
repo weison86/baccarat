@@ -138,7 +138,7 @@ private:
     /*=============================================================================*/
     Reader  *reader;
     QList<int>keyList;
-    void resetItem();
+    void reset();
     void handleBaccaratResult();
     QString StartBetTime;
     QPalette winpe;

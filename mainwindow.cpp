@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->BankPairLabel->setAutoFillBackground(true);
     ui->PlayPairLabel->setAutoFillBackground(true);
 
-    resetItem();
+
 
     setupReader(SERIAL);
 
@@ -54,15 +54,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
     initANT();//for test
-    currentIndex = 0 ;
-    currentItem = betList.at(currentIndex);
-    reader->Set_ANT(currentItem->getAntNum());
+
     BacGamble = new BaccaratGamble;
 
     BacGamble->currentdesk = Desk;
-    BacGamble->state = readybetState;
+
     //  initShowLabel();
     connectdatabase(HOSTNAME,PORT,DATABASENAME,USERNAME,PASSWD);
+
+    reset();
 }
 
 
@@ -560,7 +560,7 @@ void MainWindow::scheduleNextBet()
 
 
 }
-void MainWindow::resetItem()
+void MainWindow::reset()
 {
     for(int i =0;i < betList.length(); i++)
     {
@@ -569,8 +569,8 @@ void MainWindow::resetItem()
         betList.at(i)->clearData();
 
         betList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-//        betList.at(i)->typearea->totalChipsItem->setText("0");
-//        betList.at(i)->typearea->totalMoneyItem->setText("0");
+        //        betList.at(i)->typearea->totalChipsItem->setText("0");
+        //        betList.at(i)->typearea->totalMoneyItem->setText("0");
     }
 
     for(int i =0;i < lossList.length(); i++)
@@ -580,8 +580,8 @@ void MainWindow::resetItem()
         lossList.at(i)->setText("");
         lossList.at(i)->clearData();
         lossList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-//        lossList.at(i)->typearea->totalChipsItem->setText("0");
-//        lossList.at(i)->typearea->totalMoneyItem->setText("0");
+        //        lossList.at(i)->typearea->totalChipsItem->setText("0");
+        //        lossList.at(i)->typearea->totalMoneyItem->setText("0");
     }
 
     ui->BankLabel->setPalette(defpe);
@@ -590,8 +590,10 @@ void MainWindow::resetItem()
     ui->PlayPairLabel->setPalette(defpe);
     ui->TieLabel->setPalette(defpe);
 
-    ui->readyBet->setFocus();
+
+    ui->readyBet->setEnabled(true);
     ui->readyBet->setDefault(true);
+    ui->readyBet->setFocus();
     ui->startBet->setEnabled(false);
     ui->waitResult->setEnabled(false);
     ui->income->setEnabled(false);
@@ -614,6 +616,11 @@ void MainWindow::resetItem()
     keyList.clear();
     getUids.clear();
     putUids.clear();
+
+    currentIndex = 0 ;
+    currentItem = betList.at(currentIndex);
+    reader->Set_ANT(currentItem->getAntNum());
+    BacGamble->state = readybetState;
 
 }
 
@@ -721,6 +728,7 @@ void MainWindow::on_income_clicked()
         submitUids(key,incomeUids);
     BacGamble->state = outputState;
 
+
     ui->readyBet->setEnabled(false);
     ui->startBet->setEnabled(false);
     ui->waitResult->setEnabled(false);
@@ -778,11 +786,9 @@ void MainWindow::on_output_clicked()
 }
 
 void MainWindow::on_End_clicked()
-{ui->readyBet->setEnabled(true);
+{
 
-    resetItem();
-    BacGamble->state = readybetState;
-
+    reset();
 
 }
 
