@@ -24,6 +24,8 @@ private slots:
     void ReadUid(QList<QByteArray> list);
     void inventory();
 
+    void BacktowaitResultState();
+
     void on_tableWidget_itemChanged(QTableWidgetItem *item);
 
     void on_readyBet_clicked();

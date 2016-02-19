@@ -105,6 +105,17 @@ void MainWindow::initShowLabel()
 void MainWindow::keyReleaseEvent (QKeyEvent *event)
 {
     int k;
+    if(BacGamble->state == incomeState)
+    {
+
+        if(event->key() == Qt::Key_Backspace)
+        {
+            BacktowaitResultState();
+            qDebug()<< "back";
+        }
+
+
+    }
 
     k = event->key();
     switch(k)
@@ -371,7 +382,7 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 {
 
 
-//    qDebug() << "ReadUid";
+    //    qDebug() << "ReadUid";
     static int num;
 
     QByteArray uid;
@@ -394,10 +405,18 @@ void MainWindow::ReadUid(QList<QByteArray> list)
             moneySum+=moneyVal;
 
         }
-        currentItem->SetMoney(moneySum);
-        currentItem->SetCount(count);
-        currentItem->SetUids(uidList);
-        currentItem->setText(QString::number(moneySum));
+        if(moneySum != 0)
+        {
+            currentItem->SetMoney(moneySum);
+            currentItem->SetCount(count);
+            currentItem->SetUids(uidList);
+            currentItem->setText(QString::number(moneySum));
+        }else{
+            currentItem->clearData();
+            currentItem->setText("");
+
+
+        }
         scheduleNextBet();
     }
 
@@ -545,18 +564,24 @@ void MainWindow::resetItem()
 {
     for(int i =0;i < betList.length(); i++)
     {
-        betList.at(i)->setText("0");
+        //    betList.at(i)->setText("0");
+        betList.at(i)->setText("");
+        betList.at(i)->clearData();
+
         betList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-        betList.at(i)->typearea->totalChipsItem->setText("0");
-        betList.at(i)->typearea->totalMoneyItem->setText("0");
+//        betList.at(i)->typearea->totalChipsItem->setText("0");
+//        betList.at(i)->typearea->totalMoneyItem->setText("0");
     }
 
     for(int i =0;i < lossList.length(); i++)
     {
-        lossList.at(i)->setText("0");
+        //lossList.at(i)->setText("0");
+
+        lossList.at(i)->setText("");
+        lossList.at(i)->clearData();
         lossList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
-        lossList.at(i)->typearea->totalChipsItem->setText("0");
-        lossList.at(i)->typearea->totalMoneyItem->setText("0");
+//        lossList.at(i)->typearea->totalChipsItem->setText("0");
+//        lossList.at(i)->typearea->totalMoneyItem->setText("0");
     }
 
     ui->BankLabel->setPalette(defpe);
@@ -693,7 +718,7 @@ void MainWindow::on_income_clicked()
     qDebug() << inTotalMVal;
     key = submitWin(inTotalMVal);
     if(key !=0)
-       submitUids(key,incomeUids);
+        submitUids(key,incomeUids);
     BacGamble->state = outputState;
 
     ui->readyBet->setEnabled(false);
@@ -704,6 +729,8 @@ void MainWindow::on_income_clicked()
     ui->output->setFocus();
     ui->output->setDefault(true);
     ui->End->setEnabled(false);
+
+
     outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
     winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
 
@@ -1188,6 +1215,8 @@ void MainWindow::handlePlay_Bankpair_PlaypairWin()
 
 }
 
+
+
 void MainWindow::handleTie_BankpairWin()
 {
     outTotalMVal = 0;
@@ -1423,6 +1452,54 @@ int MainWindow::submitUids(int key,QList<QByteArray>uids)
 
 
 
+}
+
+void MainWindow::BacktowaitResultState()
+{
+
+    for(int i =0;i < betList.length(); i++)
+    {
+        //  betList.at(i)->setText("0");
+        betList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
+        //        betList.at(i)->typearea->totalChipsItem->setText("0");
+        //        betList.at(i)->typearea->totalMoneyItem->setText("0");
+    }
+
+    for(int i =0;i < lossList.length(); i++)
+    {
+        //  lossList.at(i)->setText("0");
+        lossList.at(i)->setBackgroundColor(QColor(0, 0, 0, 0));
+        // lossList.at(i)->typearea->totalChipsItem->setText("0");
+        // lossList.at(i)->typearea->totalMoneyItem->setText("0");
+    }
+    outputList.clear();
+    winList.clear();
+    outputUids.clear();
+    incomeList.clear();
+    incomeUids.clear();
+    ui->realMoneyLabel->clear();
+
+    ui->BankLabel->setPalette(defpe);
+    ui->BankPairLabel->setPalette(defpe);
+    ui->PlayLabel->setPalette(defpe);
+    ui->PlayPairLabel->setPalette(defpe);
+    ui->TieLabel->setPalette(defpe);
+
+    ui->readyBet->setEnabled(false);
+    ui->startBet->setEnabled(false);
+    ui->waitResult->setEnabled(true);
+    ui->waitResult->setFocus();
+    ui->waitResult->setDefault(true);
+    ui->income->setEnabled(false);
+    ui->output->setEnabled(false);
+    ui->End->setEnabled(false);
+    //disconnect(this,)
+    //  inventoryTimer->disconnect(this);
+
+    // disconnect(inventory,tim);
+    //inventoryTimer->stop();
+
+    BacGamble->state = waitResultState;
 }
 void MainWindow::closeEvent ( QCloseEvent *event )
 {
