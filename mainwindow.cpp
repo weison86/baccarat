@@ -371,7 +371,7 @@ void MainWindow::ReadUid(QList<QByteArray> list)
 {
 
 
-    qDebug() << "ReadUid";
+//    qDebug() << "ReadUid";
     static int num;
 
     QByteArray uid;
@@ -587,6 +587,8 @@ void MainWindow::resetItem()
     currentwinList.clear();
     currentlossList.clear();
     keyList.clear();
+    getUids.clear();
+    putUids.clear();
 
 }
 
@@ -733,7 +735,7 @@ void MainWindow::on_output_clicked()
 
         key = submitLost(outTotalMVal);
         if(key !=0)
-            submitUids(key,outputUids);
+            submitUids(key,putUids);
         ui->readyBet->setEnabled(false);
         ui->startBet->setEnabled(false);
         ui->waitResult->setEnabled(false);
