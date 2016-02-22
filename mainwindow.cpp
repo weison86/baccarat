@@ -10,7 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
         ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    // this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::FramelessWindowHint);
+    readSettings();
 
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
@@ -60,9 +61,10 @@ MainWindow::MainWindow(QWidget *parent) :
     BacGamble->currentdesk = Desk;
 
     //  initShowLabel();
-    connectdatabase(HOSTNAME,PORT,DATABASENAME,USERNAME,PASSWD);
+    connectdatabase(HostName,port,DataBaseName,UserName,PassWd);
 
     reset();
+    writeSettings();
 }
 
 
@@ -96,7 +98,7 @@ void MainWindow::initANT()
     losstestList << lossList.mid(0,3);
     losstestList << lossList.mid(8,3);
     losstestList << lossList.mid(16,3);
-//#elseif
+    //#elseif
 
 
 #endif
@@ -738,9 +740,13 @@ void MainWindow::on_income_clicked()
     }
     qDebug() << "fetch money";
     qDebug() << inTotalMVal;
-    key = submitWin(inTotalMVal);
-    if(key !=0)
-        submitUids(key,incomeUids);
+    if(inTotalMVal !=0)
+    {
+        qDebug() << inTotalMVal;
+        key = submitWin(inTotalMVal);
+        if(key !=0)
+            submitUids(key,incomeUids);
+    }
     BacGamble->state = outputState;
 
 
@@ -754,12 +760,31 @@ void MainWindow::on_income_clicked()
     ui->End->setEnabled(false);
 
     IngoreSpace();
-    outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
-    winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+    if(outIndex < outputList.length())
+    {
+        outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+        winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+        reader->Set_ANT(1 << M_ANT);
+        connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
+        inventoryTimer->start(50);
+    }
+    else
+    {
+        ui->readyBet->setEnabled(false);
+        ui->startBet->setEnabled(false);
+        ui->waitResult->setEnabled(false);
+        ui->income->setEnabled(false);
+        ui->output->setEnabled(false);;
+        ui->End->setEnabled(true);
+        ui->End->setFocus();
+        ui->End->setDefault(true);
+        BacGamble->state = GambleEnd;
+        qDebug() << "no payfor";
 
-    reader->Set_ANT(1 << M_ANT);
-    connect(inventoryTimer,SIGNAL(timeout()),this,SLOT(inventory()));
-    inventoryTimer->start(50);
+    }
+
+
+
 
 
 }
@@ -774,7 +799,7 @@ void MainWindow::IngoreSpace()
     {
         outIndex++;
         if(outIndex >= winList.length()){
-          //  outIndex = winList.length() - 1;
+            //  outIndex = winList.length() - 1;
             return;
         }
     }
@@ -783,6 +808,7 @@ void MainWindow::IngoreSpace()
 
 void MainWindow::on_output_clicked()
 {
+
     if(outputList.at(outIndex)->text() != winList.at(outIndex)->text())
     {
         return;
@@ -793,10 +819,10 @@ void MainWindow::on_output_clicked()
 
 
     if(outIndex < outputList.length()){
-   //     IngoreSpace();
-//        if();
-      outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
-      winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+        //     IngoreSpace();
+        //        if();
+        outputList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
+        winList.at(outIndex)->setBackgroundColor(QColor(255, 255, 0, 127));
 
 
     }
@@ -816,7 +842,9 @@ void MainWindow::on_output_clicked()
         ui->End->setFocus();
         ui->End->setDefault(true);
         BacGamble->state = GambleEnd;
+
     }
+
 
 
 }
@@ -1532,6 +1560,87 @@ void MainWindow::BacktowaitResultState()
 
     BacGamble->state = waitResultState;
 }
+
+
+void MainWindow::writeSettings()
+{
+
+
+    QSettings settings("andea", "baccarat");
+
+    settings.beginGroup("MainWindow");
+    settings.setValue("HOSTNAME", "192.168.1.61");
+    settings.setValue("PORT", 3306);
+    settings.setValue("DATABASENAME","bargainingchipsys");
+    settings.setValue("USERNAME","test");
+    settings.setValue("PASSWD","123");
+    settings.endGroup();
+}
+void MainWindow::readSettings()
+{
+    QSettings settings("andea", "baccarat");
+
+    settings.beginGroup("MainWindow");
+    //   resize(settings.value("size", QSize(400, 400)).toSize());
+    QString name = settings.value("HOSTNAME").toString();
+    int p = settings.value("PORT").toInt();
+    QString db = settings.value("DATABASENAME").toString();
+    QString user = settings.value("test").toString();
+    QString pw   = settings.value("PASSWD").toString();
+
+    if(name.isEmpty())
+    {
+        qDebug() << "hostname";
+        HostName = HOSTNAME;
+    }
+    else
+    {
+        HostName = name;
+    }
+    if(p == 0)
+    {
+        port = PORT;
+
+    }
+    else
+    {
+        port = p;
+    }
+    if(db.isEmpty())
+    {
+        DataBaseName = DATABASENAME;
+    }
+    else
+    {
+        DataBaseName = db;
+    }
+    if(user.isEmpty())
+    {
+        UserName = USERNAME;
+    }
+    else
+    {
+        UserName = user;
+    }
+    if(pw.isEmpty())
+    {
+        PassWd = PASSWD;
+    }
+    else
+    {
+        PassWd = pw;
+    }
+#ifdef DEBUG
+    qDebug() << HostName;
+    qDebug() << port;
+    qDebug() << DataBaseName;
+    qDebug() << UserName;
+    qDebug() << PassWd;
+#endif
+
+    settings.endGroup();
+}
+
 void MainWindow::closeEvent ( QCloseEvent *event )
 {
 

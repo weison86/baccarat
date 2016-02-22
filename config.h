@@ -5,7 +5,10 @@
 
 #define MaxAnt 9   //定义最大天线数
 
-#define SERIAL "/dev/ttyS1"
+
+#define SERIAL "/dev/ttyUSB0"
+
+//#define SERIAL "/dev/ttyS1"
 //=======================================================
 
 /*数据库连接 默认参数设置*/

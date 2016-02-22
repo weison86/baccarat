@@ -145,6 +145,13 @@ private:
     QString StartBetTime;
     QPalette winpe;
     QPalette defpe;
+    void writeSettings();
+    void readSettings();
+    QString HostName;
+    int port;
+    QString DataBaseName;
+    QString UserName;
+    QString PassWd;
 };
 
 #endif // MAINWINDOW_H
