@@ -9,7 +9,7 @@
 #include "baccarat.h"
 #include "reader.h"
 
-#define MaxAnt 9
+
 
 namespace Ui {
     class MainWindow;

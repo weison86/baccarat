@@ -70,6 +70,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::initANT()
 {
+
+
+#ifndef DEBUG
+    //betList.at()
+
+#endif
+
+#ifdef DEBUG
     betList.at(0)->SetAntNum(1 << 0);
     betList.at(1)->SetAntNum(1 << 1);
     betList.at(2)->SetAntNum(1 << 2);
@@ -88,6 +96,10 @@ void MainWindow::initANT()
     losstestList << lossList.mid(0,3);
     losstestList << lossList.mid(8,3);
     losstestList << lossList.mid(16,3);
+//#elseif
+
+
+#endif
 
 
 }
@@ -569,24 +581,22 @@ void MainWindow::reset()
 {
     for(int i =0;i < betList.length(); i++)
     {
-        //    betList.at(i)->setText("0");
+
         betList.at(i)->setText("");
         betList.at(i)->clearData();
 
         betList.at(i)->setBackgroundColor(DEF_COR_ITEM );
-        //        betList.at(i)->typearea->totalChipsItem->setText("0");
-        //        betList.at(i)->typearea->totalMoneyItem->setText("0");
+
     }
 
     for(int i =0;i < lossList.length(); i++)
     {
-        //lossList.at(i)->setText("0");
+
 
         lossList.at(i)->setText("");
         lossList.at(i)->clearData();
         lossList.at(i)->setBackgroundColor(DEF_COR_ITEM );
-        //        lossList.at(i)->typearea->totalChipsItem->setText("0");
-        //        lossList.at(i)->typearea->totalMoneyItem->setText("0");
+
     }
 
     ui->BankLabel->setPalette(defpe);
